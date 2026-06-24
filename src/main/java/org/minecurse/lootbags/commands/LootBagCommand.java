@@ -165,7 +165,6 @@ public class LootBagCommand extends BaseCommand {
    @Subcommand("reload")
    public void onReload(CommandSender sender) {
       LootBagPlugin plugin = LootBagPlugin.getInstance();
-      LootBagManager.getInstance().saveToDisk();
       plugin.reloadConfig();
       Settings.load(plugin.getConfig());
       LootBagManager.getInstance().loadFromDisk();

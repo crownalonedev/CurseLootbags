@@ -182,6 +182,7 @@ public class LootBag {
       }
 
       this.texture = base64.trim();
+      this.material = Material.SKULL_ITEM.name();
    }
 
    @JsonIgnore
@@ -194,7 +195,9 @@ public class LootBag {
       String name = this.displayName != null && !this.displayName.isEmpty()
          ? StringUtil.color(this.displayName)
          : this.getFallbackDisplayName();
-      List<String> effectiveLore = this.lore != null ? this.lore : Lists.newArrayList();
+      List<String> effectiveLore = this.lore != null
+         ? this.lore.stream().map(StringUtil::color).collect(Collectors.toList())
+         : Lists.newArrayList();
 
       ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
       ItemMeta meta = head.getItemMeta();
@@ -206,14 +209,13 @@ public class LootBag {
          head.setItemMeta(meta);
       }
 
-      this.applyTextureNbt(head);
-      return head;
+      return this.applyTextureNbt(head);
    }
 
    @JsonIgnore
-   private void applyTextureNbt(ItemStack item) {
+   private ItemStack applyTextureNbt(ItemStack item) {
       if (this.texture == null || this.texture.isEmpty()) {
-         return;
+         return item;
       }
 
       item.setType(Material.SKULL_ITEM);
@@ -227,28 +229,26 @@ public class LootBag {
          NBTItem nbt = new NBTItem(item);
          NBTCompound skullOwner = nbt.addCompound("SkullOwner");
          skullOwner.setString("Id", UUID.randomUUID().toString());
-         skullOwner.setString("Name", this.internalName == null ? "lootbag" : this.internalName);
          NBTCompound properties = skullOwner.addCompound("Properties");
          NBTCompoundList texturesList = properties.getCompoundList("textures");
          NBTListCompound textureEntry = texturesList.addCompound();
          textureEntry.setString("Value", this.texture);
          ItemStack result = nbt.getItem();
 
-         item.setType(result.getType());
-         item.setDurability(result.getDurability());
-         item.setItemMeta(result.getItemMeta());
-
-         ItemMeta newMeta = item.getItemMeta();
-         if (newMeta != null) {
+         // Re-apply display name and lore onto the NBT result directly
+         ItemMeta resultMeta = result.getItemMeta();
+         if (resultMeta != null) {
             if (existingName != null) {
-               newMeta.setDisplayName(existingName);
+               resultMeta.setDisplayName(existingName);
             }
             if (existingLore != null) {
-               newMeta.setLore(existingLore);
+               resultMeta.setLore(existingLore);
             }
-            item.setItemMeta(newMeta);
+            result.setItemMeta(resultMeta);
          }
+         return result;
       } catch (Exception ignored) {
+         return item;
       }
    }
 
@@ -300,7 +300,7 @@ public class LootBag {
       if (this.lore != null && !this.lore.isEmpty()) {
          ItemMeta meta = itemStack.getItemMeta();
          if (meta != null) {
-            meta.setLore(this.lore);
+            meta.setLore(this.lore.stream().map(StringUtil::color).collect(Collectors.toList()));
             itemStack.setItemMeta(meta);
          }
       }
@@ -410,7 +410,7 @@ public class LootBag {
       item.setString("lootBagType", this.getInternalName());
       ItemStack built = item.getItem();
       if (this.texture != null && !this.texture.isEmpty()) {
-         this.applyTextureNbt(built);
+         built = this.applyTextureNbt(built);
       }
       return built;
    }
@@ -490,7 +490,7 @@ public class LootBag {
       item.setString("lootBagType", this.getInternalName());
       ItemStack built = item.getItem();
       if (this.texture != null && !this.texture.isEmpty()) {
-         this.applyTextureNbt(built);
+         built = this.applyTextureNbt(built);
       }
       return built;
    }

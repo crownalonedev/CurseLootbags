@@ -45,7 +45,7 @@ public class LootBagManager {
    public void initialize() {
       File file = new File(this.path);
       if (!file.exists()) {
-         file.mkdir();
+         file.mkdirs();
       }
 
       if (!(file = new File(this.path + "/" + this.file)).exists()) {
@@ -138,7 +138,9 @@ public class LootBagManager {
 
    public void saveToDisk() {
       File dir = new File(this.path + "/lootbags");
-      dir.mkdir();
+      if (!dir.exists()) {
+         dir.mkdirs();
+      }
       ObjectMapper mapper = new ObjectMapper();
       mapper.enable(SerializationFeature.INDENT_OUTPUT);
       mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
@@ -148,23 +150,53 @@ public class LootBagManager {
          this.originalDump = Lists.newArrayList(this.LootBags);
       }
 
-      for (LootBag LootBag2 : this.originalDump) {
-         if (!this.LootBags.contains(LootBag2)) {
-            new File(this.path + "/lootbags/" + LootBag2.getInternalName() + ".json").delete();
-         } else {
-            File jsonFile = new File(this.path + "/lootbags/" + LootBag2.getInternalName() + ".json");
-
-            try {
-               java.io.FileOutputStream fos = new java.io.FileOutputStream(jsonFile);
-               mapper.writeValue(fos, LootBag2);
-               fos.close();
-            } catch (Exception var6) {
-               this.plugin.getLogger().warning("Failed to save lootbag " + LootBag2.getInternalName() + ": " + var6.toString());
+      // Delete files for lootbags that were removed
+      for (LootBag old : this.originalDump) {
+         if (!this.LootBags.contains(old)) {
+            File oldFile = new File(this.path + "/lootbags/" + old.getInternalName() + ".json");
+            if (oldFile.exists()) {
+               oldFile.delete();
             }
          }
       }
 
+      // Save all current lootbags
+      for (LootBag bag : this.LootBags) {
+         File jsonFile = new File(this.path + "/lootbags/" + bag.getInternalName() + ".json");
+
+         try (java.io.FileOutputStream fos = new java.io.FileOutputStream(jsonFile)) {
+            mapper.writeValue(fos, bag);
+         } catch (Exception var6) {
+            this.plugin.getLogger().warning("Failed to save lootbag " + bag.getInternalName() + ": " + var6.toString());
+         }
+      }
+
       this.originalDump = Lists.newArrayList(this.LootBags);
+   }
+
+   public void saveSingle(LootBag bag) {
+      File dir = new File(this.path + "/lootbags");
+      if (!dir.exists()) {
+         dir.mkdirs();
+      }
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+      mapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+      File jsonFile = new File(this.path + "/lootbags/" + bag.getInternalName() + ".json");
+
+      try (java.io.FileOutputStream fos = new java.io.FileOutputStream(jsonFile)) {
+         mapper.writeValue(fos, bag);
+      } catch (Exception var6) {
+         this.plugin.getLogger().warning("Failed to save lootbag " + bag.getInternalName() + ": " + var6.toString());
+      }
+
+      // Update originalDump to reflect current state
+      if (this.originalDump == null) {
+         this.originalDump = Lists.newArrayList(this.LootBags);
+      } else if (!this.originalDump.contains(bag)) {
+         this.originalDump.add(bag);
+      }
    }
 
    public JavaPlugin getPlugin() {

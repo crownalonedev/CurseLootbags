@@ -1,45 +1,45 @@
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\listeners\LootBagListener.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\LootbagListMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\BattleQueueMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\EditorData.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\hype\HypeBox.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\LootBag.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\rewards\RewardMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\utils\ColorUtil.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\commands\HypeBoxCommand.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\utils\LootBagUtils.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\LootbagCategoryMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\PlayerBattle.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\BattleInfo.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\listeners\HyperBoxListener.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\HalfType.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\CrateAnimation.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\CrateType.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\BattleCreateMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\api\LootBagNotificationApi.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\hype\HypeBoxListMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\utils\DropUtils.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\tasks\LootBagSaleTask.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\BattleManager.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\manager\EditorManager.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\events\HypeBoxFinishEvent.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\AnimationType.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\animation\RevolvingCircleTask.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\commands\LootBagsCommand.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\LootBagDisplayMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\battle\BattleMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\manager\HypeManager.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\manager\LootBagManager.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\LootBagPreviewMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\tasks\HypeChatTask.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\commands\HypeViewCommand.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\commands\LootBagCommand.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\hype\HypeBoxView.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\LootBagCreationMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\LootBagPlugin.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\rewards\RewardConfirmMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\listeners\EditorLogicListener.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\struct\EditType.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\manager\AnimationManager.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\menus\rewards\RewardRarityMenu.java
-C:\Users\realo\OneDrive\Desktop\Minecurse Sources\CurseLootbags\src\main\java\org\minecurse\lootbags\settings\Settings.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\manager\LootBagManager.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\utils\LootBagUtils.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\LootBagPreviewMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\tasks\LootBagSaleTask.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\commands\HypeBoxCommand.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\LootBagCreationMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\LootBagDisplayMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\commands\LootBagsCommand.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\rewards\RewardRarityMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\LootbagListMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\CrateType.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\BattleInfo.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\hype\HypeBoxListMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\LootbagCategoryMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\BattleMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\LootBagPlugin.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\listeners\HyperBoxListener.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\hype\HypeBoxView.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\manager\EditorManager.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\api\LootBagNotificationApi.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\LootBag.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\events\HypeBoxFinishEvent.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\tasks\HypeChatTask.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\BattleQueueMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\commands\LootBagCommand.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\listeners\LootBagListener.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\CrateAnimation.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\manager\AnimationManager.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\BattleManager.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\rewards\RewardConfirmMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\rewards\RewardMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\EditType.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\listeners\EditorLogicListener.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\manager\HypeManager.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\utils\DropUtils.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\menus\hype\HypeBox.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\commands\HypeViewCommand.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\utils\ColorUtil.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\EditorData.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\PlayerBattle.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\animation\RevolvingCircleTask.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\AnimationType.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\struct\HalfType.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\battle\BattleCreateMenu.java
+C:\Users\khush\OneDrive\Desktop\CurseLBS\src\main\java\org\minecurse\lootbags\settings\Settings.java

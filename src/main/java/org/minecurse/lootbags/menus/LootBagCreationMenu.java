@@ -96,15 +96,17 @@ public class LootBagCreationMenu implements Listener {
    }
 
    private void refreshMenu(Player player) {
+      LootBagManager.getInstance().saveSingle(this.lootBag);
       LootBagCreationMenu menu = new LootBagCreationMenu(this.lootBag);
       menu.show(player);
       this.sound(player);
    }
 
    private void onFinish(Player player) {
+      LootBagManager.getInstance().saveSingle(this.lootBag);
       this.refreshMenu(player);
       this.editType.remove(player.getUniqueId());
-      player.sendMessage(LootBagPlugin.prefix("Your current lootbag action has been completed."));
+      player.sendMessage(LootBagPlugin.prefix("&aLootbag &f" + this.lootBag.getInternalName() + " &ahas been saved successfully."));
    }
 
    @EventHandler
