@@ -214,10 +214,12 @@ public class LootBagManager {
    private LootBag readYaml(File file, ObjectMapper jsonMapper) throws IOException {
       String yamlStr = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
       Yaml yaml = new Yaml();
-      Map<String, Object> data = yaml.load(yamlStr);
-      if (data == null) {
+      Object loaded = yaml.load(yamlStr);
+      if (!(loaded instanceof Map)) {
          return null;
       } else {
+         @SuppressWarnings("unchecked")
+         Map<String, Object> data = (Map<String, Object>) loaded;
          return jsonMapper.convertValue(data, LootBag.class);
       }
    }
