@@ -154,11 +154,6 @@ public class LootBagManager {
             File jsonFile = new File(this.path + "/lootbags/" + LootBag2.getInternalName() + ".json");
 
             try {
-               if (jsonFile.exists()) {
-                  jsonFile.delete();
-               }
-
-               jsonFile.createNewFile();
                mapper.writeValue(jsonFile, LootBag2);
             } catch (Exception var6) {
                this.plugin.getLogger().warning("Failed to save lootbag " + LootBag2.getInternalName() + ": " + var6.toString());
