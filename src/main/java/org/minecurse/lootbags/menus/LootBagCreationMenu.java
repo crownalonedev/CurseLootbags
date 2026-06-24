@@ -40,7 +40,7 @@ public class LootBagCreationMenu implements Listener {
    public LootBagCreationMenu(LootBag lootBag) {
       this.lootBag = lootBag;
       Bukkit.getServer().getPluginManager().registerEvents(this, LootManagerPlugin.getInstance());
-      this.menu = new ChestMenu("Editing: " + lootBag.getInternalName(), 5);
+      this.menu = new ChestMenu("Editing: " + lootBag.getInternalName(), 6);
    }
 
    public void show(Player player) {
