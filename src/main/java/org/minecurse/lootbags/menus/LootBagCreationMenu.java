@@ -64,10 +64,27 @@ public class LootBagCreationMenu implements Listener {
       this.menu.setButton(28, new Button(this.toggleItem(Material.GOLDEN_APPLE, "&d&lAlways Max", this.lootBag.isAlwaysMax()), (p, c) -> { if (this.lootBag.isBundle()) { p.sendMessage(LootBagPlugin.prefix("&cDisable Bundle first.")); return; } this.lootBag.setAlwaysMax(!this.lootBag.isAlwaysMax()); p.sendMessage(LootBagPlugin.prefix("Always Max: " + RetroUtils.formatBoolean(this.lootBag.isAlwaysMax()))); this.refreshMenu(p); }));
       this.menu.setButton(29, new Button(this.toggleItem(Material.CHEST, "&a&lBundle", this.lootBag.isBundle()), (p, c) -> { this.lootBag.setBundle(!this.lootBag.isBundle()); p.sendMessage(LootBagPlugin.prefix("Bundle: " + RetroUtils.formatBoolean(this.lootBag.isBundle()))); this.refreshMenu(p); }));
       this.menu.setButton(30, new Button(this.toggleItem(Material.GLOWSTONE_DUST, "&f&lGlow", this.lootBag.isGlowing()), (p, c) -> { this.lootBag.setGlowing(!this.lootBag.isGlowing()); p.sendMessage(LootBagPlugin.prefix("Glow: " + RetroUtils.formatBoolean(this.lootBag.isGlowing()))); this.refreshMenu(p); }));
-      this.menu.setButton(31, new Button(this.toggleItem(this.lootBag.isBroadcast() ? Material.REDSTONE_TORCH_ON : Material.TORCH, "&d&lBroadcast", this.lootBag.isBroadcast()), (p, c) -> { this.lootBag.setBroadcast(!this.lootBag.isBroadcast()); p.sendMessage(LootBagPlugin.prefix("Broadcast: " + RetroUtils.formatBoolean(this.lootBag.isBroadcast()))); this.refreshMenu(p); }));
+      this.menu.setButton(31, new Button(this.toggleItem(this.lootBag.isBroadcast() ? Material.REDSTONE_TORCH_ON : Material.TORCH, "&d&lOpen Announce", this.lootBag.isBroadcast()), (p, c) -> { this.lootBag.setBroadcast(!this.lootBag.isBroadcast()); p.sendMessage(LootBagPlugin.prefix("Open Announce: " + RetroUtils.formatBoolean(this.lootBag.isBroadcast()))); this.refreshMenu(p); }));
       this.menu.setButton(32, new Button(this.toggleItem(this.lootBag.isBonusLore() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK, "&e&lBonus Lore", this.lootBag.isBonusLore()), (p, c) -> { this.lootBag.setBonusLore(!this.lootBag.isBonusLore()); p.sendMessage(LootBagPlugin.prefix("Bonus Lore: " + RetroUtils.formatBoolean(this.lootBag.isBonusLore()))); this.refreshMenu(p); }));
       this.menu.setButton(33, new Button(this.toggleItem(this.lootBag.isRewardLore() ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK, "&2&lReward Lore", this.lootBag.isRewardLore()), (p, c) -> { this.lootBag.setRewardLore(!this.lootBag.isRewardLore()); p.sendMessage(LootBagPlugin.prefix("Reward Lore: " + RetroUtils.formatBoolean(this.lootBag.isRewardLore()))); this.refreshMenu(p); }));
-      this.menu.setButton(34, new Button(this.toggleItem(Material.BOOK, "&a&lShowcase", this.lootBag.isShowcasedLootBag()), (p, c) -> { if (LootBagManager.getInstance().isAlreadyToggled() && LootBagManager.getInstance().findShowcasedLootBag() != this.lootBag) { p.sendMessage(LootBagPlugin.prefix("&cDisable showcase on \"" + LootBagManager.getInstance().findShowcasedLootBag().getInternalName() + "\" first.")); return; } this.lootBag.setShowcasedLootBag(!this.lootBag.isShowcasedLootBag()); p.sendMessage(LootBagPlugin.prefix("Showcase: " + RetroUtils.formatBoolean(this.lootBag.isShowcasedLootBag()))); this.refreshMenu(p); }));
+      this.menu.setButton(34, new Button(this.toggleItem(Material.BOOK, "&a&lSale Broadcast", this.lootBag.isShowcasedLootBag()), (p, c) -> { 
+         if (!this.lootBag.isShowcasedLootBag()) {
+            boolean changedOther = false;
+            for (LootBag lb : LootBagManager.getInstance().getLootBags()) {
+               if (lb != this.lootBag && lb.isShowcasedLootBag()) {
+                  lb.setShowcasedLootBag(false);
+                  LootBagManager.getInstance().saveSingle(lb);
+                  changedOther = true;
+               }
+            }
+            if (changedOther) {
+               p.sendMessage(LootBagPlugin.prefix("&eAutomatically disabled sale broadcast on other items."));
+            }
+         }
+         this.lootBag.setShowcasedLootBag(!this.lootBag.isShowcasedLootBag()); 
+         p.sendMessage(LootBagPlugin.prefix("Sale Broadcast: " + RetroUtils.formatBoolean(this.lootBag.isShowcasedLootBag()))); 
+         this.refreshMenu(p); 
+      }));
 
       this.menu.setButton(38, new Button(new ItemBuilder(Material.PAPER).name("&3&lInternal Name").lore("&7" + this.lootBag.getInternalName()).lore("").lore("&a&l» &7Click to rename in chat."), (p, c) -> this.startChatEdit(p, EditType.INTERNAL, "&7Current: " + this.lootBag.getInternalName(), "&7Type the new internal name (A-Z, 0-9, _ only).")));
       this.menu.setButton(40, new Button(new ItemBuilder(Material.ENDER_PORTAL_FRAME).name("&2&lType: &f" + this.lootBag.getType().name()).lore("").lore("&a&l» &7Click to cycle type."), (p, c) -> { CrateType[] types = CrateType.values(); CrateType next = types[(this.lootBag.getType().ordinal() + 1) % types.length]; this.lootBag.setType(next); p.sendMessage(LootBagPlugin.prefix("Type: &f" + next.name())); this.refreshMenu(p); }));

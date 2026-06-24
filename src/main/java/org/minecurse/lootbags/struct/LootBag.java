@@ -408,6 +408,9 @@ public class LootBag {
 
       NBTItem item = new NBTItem(builder);
       item.setString("lootBagType", this.getInternalName());
+      if (this.getType() == CrateType.HYPE_BOX) {
+         item.setString("hypebox_uuid", UUID.randomUUID().toString());
+      }
       ItemStack built = item.getItem();
       if (this.texture != null && !this.texture.isEmpty()) {
          built = this.applyTextureNbt(built);
@@ -488,6 +491,9 @@ public class LootBag {
 
       NBTItem item = new NBTItem(builder);
       item.setString("lootBagType", this.getInternalName());
+      if (this.getType() == CrateType.HYPE_BOX) {
+         item.setString("hypebox_uuid", UUID.randomUUID().toString());
+      }
       ItemStack built = item.getItem();
       if (this.texture != null && !this.texture.isEmpty()) {
          built = this.applyTextureNbt(built);

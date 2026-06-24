@@ -14,17 +14,17 @@ lootbag-announce:
 # ─────────────────────────────────────────────────────────
 # Server Branding — change these when switching domains
 # ─────────────────────────────────────────────────────────
-store-url: "store.cursepvp.org"
+store-url: "store.minecurse.org"
 
 # Server name used in crate-opening broadcast prefix (e.g. "&5&lCurse &7┃ &6")
-server-name: "Curse"
+server-name: "&2&lMine&a&lCurse"
 
 # Crate-opening broadcast format
 # Placeholders: %server-name%, %player%, %lootbag%
 crate-broadcast: "&5&l%server-name% &7┃ &6%player%&f is opening %lootbag%"
 
 # Bot name shown in Hype Box Battles (with color codes)
-bot-name: "&5&lCurse Bot"
+bot-name: "&a&lCurse Bot"
 
 # Bot display name for plain-text descriptions (no color codes)
 bot-name-plain: "Curse Bot"

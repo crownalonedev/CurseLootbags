@@ -52,41 +52,31 @@ public class BattleQueueMenu implements InventoryProvider {
                         PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
                      } else if (battler == player) {
                         player.sendMessage(LootBagPlugin.hypePrefix("&CYou can not battle yourself."));
-                     } else if (hand.getAmount() < info.getCount()) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CYou must be holding {0} of these Hype Box.", info.getCount()));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-                     } else if (!battler.isOnline()) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CThis player has logged out."));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-                     } else if (LocUtil.canPvp(player, player.getLocation())) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CYou must be in a Safe-Zone inorder to join this battle."));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-                     } else if (LocUtil.canPvp(battler, battler.getLocation())) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CThis player is currently in the War-Zone."));
-                        battler.sendMessage(LootBagPlugin.hypePrefix("&cA Player tried to join your battle. &f(Must be in &aSafe-Zone&f)"));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-                     } else if (LootBagPlugin.getInstance().getBattleManager().getActiveBattles().size() > 3) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CThere is currently 4 Hype Box Battles running, please wait."));
-                        battler.sendMessage(
-                           LootBagPlugin.hypePrefix("&cA player tried to join your Hype Box Battle but there was already 3 running! &7(/hypebox removebattle)")
-                        );
-                     } else if (info.isActive()) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&CThis battle is already on-going."));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-                     } else if (!BattleManager.getInstance().getActiveBattles().contains(info)) {
-                        player.sendMessage(LootBagPlugin.hypePrefix("&cThis hypebox battle no longer exists."));
-                        PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
                      } else {
-                        player.updateInventory();
-                        if (hand.getAmount() > info.getCount()) {
-                           hand.setAmount(hand.getAmount() - info.getCount());
+                        int totalBoxes = LootBagUtils.countLootBags(player, lootBag);
+                        if (totalBoxes < info.getCount()) {
+                           player.sendMessage(LootBagPlugin.hypePrefix("&CYou must have {0} of these Hype Box in your inventory.", info.getCount()));
+                           PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
+                        } else if (!battler.isOnline()) {
+                           player.sendMessage(LootBagPlugin.hypePrefix("&CThis player has logged out."));
+                           PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
+                        } else if (LootBagPlugin.getInstance().getBattleManager().getActiveBattles().size() > 3) {
+                           player.sendMessage(LootBagPlugin.hypePrefix("&CThere is currently 4 Hype Box Battles running, please wait."));
+                           battler.sendMessage(
+                              LootBagPlugin.hypePrefix("&cA player tried to join your Hype Box Battle but there was already 3 running! &7(/hypebox removebattle)")
+                           );
+                        } else if (info.isActive()) {
+                           player.sendMessage(LootBagPlugin.hypePrefix("&CThis battle is already on-going."));
+                           PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
+                        } else if (!BattleManager.getInstance().getActiveBattles().contains(info)) {
+                           player.sendMessage(LootBagPlugin.hypePrefix("&cThis hypebox battle no longer exists."));
+                           PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
                         } else {
-                           player.setItemInHand(null);
+                           LootBagUtils.removeLootBags(player, lootBag, info.getCount());
+                           info.setPlayerTwo(new PlayerBattle(player, false));
+                           player.closeInventory();
+                           info.start();
                         }
-
-                        info.setPlayerTwo(new PlayerBattle(player, false));
-                        player.closeInventory();
-                        info.start();
                      }
                   }
                )
@@ -120,15 +110,15 @@ public class BattleQueueMenu implements InventoryProvider {
          if (lootBag == null || lootBag.getType() != CrateType.HYPE_BOX) {
             player.sendMessage(LootBagPlugin.hypePrefix("&CYou must be holding a Hype Box."));
             PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-         } else if (hand.getAmount() < 3 || hand.getAmount() > 8) {
-            player.sendMessage(LootBagPlugin.hypePrefix("&CYou need 3 or less then 8 Hype boxes to create a battle."));
-            PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
-         } else if (LocUtil.canPvp(player, player.getLocation())) {
-            player.sendMessage(LootBagPlugin.hypePrefix("&CYou must be in a pvp disabled zone inorder to create this battle."));
-            PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
          } else {
-            PlayerUtils.playSound(player, Sound.ANVIL_USE, 1.25F);
-            new BattleCreateMenu(lootBag, hand.getAmount()).getInventory().open(player);
+            int totalBoxes = LootBagUtils.countLootBags(player, lootBag);
+            if (totalBoxes < 1) {
+               player.sendMessage(LootBagPlugin.hypePrefix("&cYou need at least 1 Hype box to create a battle."));
+               PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
+            } else {
+               PlayerUtils.playSound(player, Sound.ANVIL_USE, 1.25F);
+               new BattleCreateMenu(lootBag, totalBoxes).getInventory().open(player);
+            }
          }
       }));
    }

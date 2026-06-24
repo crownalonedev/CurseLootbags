@@ -212,9 +212,15 @@ public class LootBagCommand extends BaseCommand {
    @CommandCompletion("@players @lootBags")
    public void onGiveHalf(CommandSender sender, OnlinePlayer targetPlayer, LootBag bag, @Default("1") Integer amount) {
       Player target = targetPlayer != null ? targetPlayer.getPlayer() : (Player)sender;
-      ItemStack itemStack = bag.getLootBag();
-      itemStack.setAmount(amount);
-      PlayerUtils.giveOrDropProtectedItem(target, itemStack, 30);
+      if (bag.getType() == CrateType.HYPE_BOX) {
+         for (int i = 0; i < amount; i++) {
+            PlayerUtils.giveOrDropProtectedItem(target, bag.getLootBag(), 30);
+         }
+      } else {
+         ItemStack itemStack = bag.getLootBag();
+         itemStack.setAmount(amount);
+         PlayerUtils.giveOrDropProtectedItem(target, itemStack, 30);
+      }
       target.sendMessage(LootBagPlugin.prefix("You've received a {0}&r &7loot bag.", bag.getDisplayName()));
       if (target != sender) {
          sender.sendMessage(LootBagPlugin.prefix("You've given {0} a {1}&r &7loot bag.", target.getName(), bag.getDisplayName()));

@@ -39,9 +39,10 @@ public class HypeBoxCommand extends BaseCommand {
       if (battleInfo == null) {
          player.sendMessage(LootBagPlugin.hypePrefix("&cYou could not cancel your Hype Box battle, maybe it is running."));
       } else {
-         ItemStack itemStack = battleInfo.getLootBag().getLootBag();
-         itemStack.setAmount(battleInfo.getCount());
-         DropUtils.giveOrDropProtectedItem(player, itemStack);
+         for (int i = 0; i < battleInfo.getCount(); i++) {
+            ItemStack itemStack = battleInfo.getLootBag().getLootBag();
+            DropUtils.giveOrDropProtectedItem(player, itemStack);
+         }
          battleManager.getActiveBattles().remove(battleInfo);
       }
    }

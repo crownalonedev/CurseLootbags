@@ -68,6 +68,8 @@ public class LootBagPlugin extends JavaPlugin {
 
    public void onEnable() {
       this.saveDefaultConfig();
+      this.getConfig().options().copyDefaults(true);
+      this.saveConfig();
       Settings.load(this.getConfig());
       this.init();
       this.registerListeners();

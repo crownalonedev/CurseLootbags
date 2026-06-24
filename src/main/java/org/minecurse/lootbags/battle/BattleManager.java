@@ -10,7 +10,7 @@ import org.minecurse.lootbags.LootBagPlugin;
 public class BattleManager {
    private final List<BattleInfo> activeBattles = new ArrayList<>();
    private final ItemStack botHead = SkullUtils.fromUrl(
-      Type.ITEM, "http://textures.minecraft.net/texture/739481c453bda4f9f594521c50569b0585a6edbb2182475a5e3e23a582a7a13"
+      Type.ITEM, "http://textures.minecraft.net/texture/a2a90f8cd5a8622a9a4044542cd12be9dc87a59e5fab562096b22fa75a0a8a01"
    );
 
    public List<BattleInfo> getActiveBattles() {

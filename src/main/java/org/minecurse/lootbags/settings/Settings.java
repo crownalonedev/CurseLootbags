@@ -18,7 +18,12 @@ public class Settings {
    public static void load(FileConfiguration config) {
       storeUrl = config.getString("store-url", "store.infusedpvp.org");
       serverName = config.getString("server-name", "Curse");
-      botName = config.getString("bot-name", "&5&lCurse Bot");
+      botName = config.getString("bot-name", "&a&lCurse Bot");
+      if (botName.equals("&5&lCurse Bot")) {
+         botName = "&a&lCurse Bot";
+         config.set("bot-name", botName);
+         org.minecurse.lootbags.LootBagPlugin.getInstance().saveConfig();
+      }
       botNamePlain = config.getString("bot-name-plain", "Curse Bot");
       String rawCrateBroadcast = config.getString("crate-broadcast", "&5&l%server-name% &7┃ &6%player%&f is opening %lootbag%");
       crateBroadcast = rawCrateBroadcast.replace("%server-name%", serverName);
