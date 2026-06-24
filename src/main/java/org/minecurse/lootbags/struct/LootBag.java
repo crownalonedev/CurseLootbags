@@ -33,6 +33,7 @@ public class LootBag {
    private String internalName;
    private String displayName;
    private String item;
+   private String texture;
    private List<Reward> rewards;
    private List<Reward> jackpotRewards;
    private List<Reward> bonusRewards;
@@ -73,6 +74,10 @@ public class LootBag {
 
    @JsonIgnore
    public String getDisplayName() {
+      if (this.displayName != null && !this.displayName.isEmpty()) {
+         return StringUtil.color(this.displayName);
+      }
+
       ItemStack item = this.getItemStack();
       ItemMeta meta = item.getItemMeta();
       return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : this.getFallbackDisplayName();
@@ -84,6 +89,7 @@ public class LootBag {
 
    @JsonIgnore
    public void setDisplay(String displayName) {
+      this.displayName = displayName;
       ItemStack item = this.getItemStack();
       ItemMeta meta = item.getItemMeta();
       meta.setDisplayName(StringUtil.color(displayName));
@@ -106,6 +112,15 @@ public class LootBag {
 
    @JsonIgnore
    public String getTexture() {
+      if (this.texture != null && !this.texture.isEmpty()) {
+         return this.texture;
+      }
+
+      return this.readTextureFromItem();
+   }
+
+   @JsonIgnore
+   private String readTextureFromItem() {
       ItemStack item = this.getItemStack();
       if (item == null || item.getType() != Material.SKULL_ITEM) {
          return null;
@@ -155,6 +170,13 @@ public class LootBag {
          return;
       }
 
+      String trimmed = base64.trim();
+      this.texture = trimmed;
+      this.applyTextureToItem(trimmed);
+   }
+
+   @JsonIgnore
+   private void applyTextureToItem(String base64) {
       String currentName = this.getDisplayName();
       List<String> currentLore = this.getLore();
 
@@ -176,7 +198,7 @@ public class LootBag {
       NBTCompound properties = skullOwner.addCompound("Properties");
       NBTCompoundList texturesList = properties.getCompoundList("textures");
       NBTListCompound textureEntry = texturesList.addCompound();
-      textureEntry.setString("Value", base64.trim());
+      textureEntry.setString("Value", base64);
       head = nbt.getItem();
 
       this.item = new SerializedItemStack(head).get();
@@ -184,6 +206,7 @@ public class LootBag {
 
    @JsonIgnore
    public void removeTexture() {
+      this.texture = null;
       ItemStack item = this.getItemStack();
       if (item == null) {
          return;
@@ -203,6 +226,16 @@ public class LootBag {
       }
 
       this.item = new SerializedItemStack(item).get();
+   }
+
+   @JsonIgnore
+   public void ensureTextureSynced() {
+      if (this.texture != null && !this.texture.isEmpty()) {
+         String itemTexture = this.readTextureFromItem();
+         if (!this.texture.equals(itemTexture)) {
+            this.applyTextureToItem(this.texture);
+         }
+      }
    }
 
    @JsonIgnore

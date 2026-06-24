@@ -111,7 +111,11 @@ public class LootBagManager {
 
          for (File f : Objects.requireNonNull(file.listFiles())) {
             try {
-               this.LootBags.add(mapper.readValue(f, LootBag.class));
+               LootBag loaded = mapper.readValue(f, LootBag.class);
+               if (loaded != null) {
+                  loaded.ensureTextureSynced();
+                  this.LootBags.add(loaded);
+               }
             } catch (Exception var8) {
             }
          }
