@@ -17,7 +17,6 @@ import java.util.Objects;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.minecurse.lootbags.LootBagPlugin;
 import org.minecurse.lootbags.struct.LootBag;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 public class LootBagManager {
@@ -197,18 +196,144 @@ public class LootBagManager {
 
    @SuppressWarnings("unchecked")
    private void writeYaml(File file, LootBag bag, ObjectMapper jsonMapper) throws IOException {
-      Map<String, Object> data = jsonMapper.convertValue(bag, Map.class);
-      DumperOptions options = new DumperOptions();
-      options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-      options.setPrettyFlow(true);
-      options.setIndent(2);
-      Yaml yaml = new Yaml(options);
-      String yamlStr = yaml.dump(data);
+      StringBuilder sb = new StringBuilder();
+      String name = bag.getInternalName() != null ? bag.getInternalName() : "lootbag";
+
+      sb.append("# ═══════════════════════════════════════════════════════════════\n");
+      sb.append("# Lootbag Configuration: ").append(name).append("\n");
+      sb.append("# ═══════════════════════════════════════════════════════════════\n");
+      sb.append("# Edit this file and run /el reload to apply changes.\n");
+      sb.append("\n");
+
+      sb.append("# ── Identity ───────────────────────────────────────────────────\n");
+      sb.append("# Internal name used in commands (A-Z, 0-9, _ only)\n");
+      sb.append("internalName: ").append(yamlQuote(bag.getInternalName())).append("\n");
+      sb.append("\n");
+
+      sb.append("# Display name shown in-game (supports & color codes)\n");
+      sb.append("displayName: ").append(yamlQuote(bag.getDisplayNameField())).append("\n");
+      sb.append("\n");
+
+      sb.append("# ── Appearance ─────────────────────────────────────────────────\n");
+      sb.append("# Material of the lootbag item (e.g. CHEST, SKULL_ITEM, ENDER_CHEST)\n");
+      sb.append("# If a texture is set below, this is overridden by a player head\n");
+      sb.append("material: ").append(yamlQuote(bag.getMaterialField())).append("\n");
+      sb.append("\n");
+
+      sb.append("# Base64 player-head texture value (from head databases)\n");
+      sb.append("# Set to null to use the default material instead\n");
+      sb.append("texture: ").append(bag.hasTexture() ? yamlQuote(bag.getTexture()) : "null").append("\n");
+      sb.append("\n");
+
+      sb.append("# Custom lore lines shown on the lootbag item\n");
+      sb.append("# Each line supports & color codes. Use an empty list [] for no lore.\n");
+      List<String> lore = bag.getLore();
+      if (lore == null || lore.isEmpty()) {
+         sb.append("lore: []\n");
+      } else {
+         sb.append("lore:\n");
+         for (String line : lore) {
+            sb.append("  - ").append(yamlQuote(line)).append("\n");
+         }
+      }
+      sb.append("\n");
+
+      sb.append("# ── Rewards ────────────────────────────────────────────────────\n");
+      sb.append("# Minimum number of random rewards given per open\n");
+      sb.append("minRewards: ").append(bag.getMinRewards()).append("\n");
+      sb.append("\n");
+      sb.append("# Maximum number of random rewards given per open\n");
+      sb.append("maxRewards: ").append(bag.getMaxRewards()).append("\n");
+      sb.append("\n");
+      sb.append("# If true, always give exactly maxRewards (ignores minRewards)\n");
+      sb.append("alwaysMax: ").append(bag.isAlwaysMax()).append("\n");
+      sb.append("\n");
+      sb.append("# If true, give ALL rewards instead of picking randomly\n");
+      sb.append("bundle: ").append(bag.isBundle()).append("\n");
+      sb.append("\n");
+
+      sb.append("# ── Display Options ────────────────────────────────────────────\n");
+      sb.append("# Apply an enchantment glow to the lootbag item\n");
+      sb.append("glowing: ").append(bag.isGlowing()).append("\n");
+      sb.append("\n");
+      sb.append("# Broadcast a message to the server when this lootbag is opened\n");
+      sb.append("broadcast: ").append(bag.isBroadcast()).append("\n");
+      sb.append("\n");
+      sb.append("# Show bonus rewards in the item lore\n");
+      sb.append("bonusLore: ").append(bag.isBonusLore()).append("\n");
+      sb.append("\n");
+      sb.append("# Show the reward list in the item lore\n");
+      sb.append("rewardLore: ").append(bag.isRewardLore()).append("\n");
+      sb.append("\n");
+      sb.append("# Feature this lootbag in the display menu (only one at a time)\n");
+      sb.append("showcasedLootBag: ").append(bag.isShowcasedLootBag()).append("\n");
+      sb.append("\n");
+
+      sb.append("# ── Type & Animation ───────────────────────────────────────────\n");
+      sb.append("# Lootbag type: LOOTBAG, MONTHLY, HYPE_BOX, GENERATOR, ARMOR_CACHE, BUNDLE, LUCKY_BLOCK\n");
+      sb.append("type: ").append(bag.getType().name()).append("\n");
+      sb.append("\n");
+      sb.append("# Animation type: NORMAL, CIRCLE, GENERATOR\n");
+      sb.append("animationType: ").append(bag.getAnimationType().name()).append("\n");
+      sb.append("\n");
+
+      sb.append("# ── Rewards Data ───────────────────────────────────────────────\n");
+      sb.append("# Reward items are stored as serialized objects below.\n");
+      sb.append("# Use the in-game /el edit menu to add/remove rewards.\n");
+      sb.append("rewards:\n");
+      appendRewards(sb, bag.getRewards(), jsonMapper);
+      sb.append("jackpotRewards:\n");
+      appendRewards(sb, bag.getJackpotRewards(), jsonMapper);
+      sb.append("bonusRewards:\n");
+      appendRewards(sb, bag.getBonusRewards(), jsonMapper);
+
+      sb.append("\n");
+      sb.append("# ── Internal (do not edit unless you know what you're doing) ──\n");
+      sb.append("# Serialized item data (material, name, lore, enchants, etc.)\n");
+      sb.append("# The fields above override this where applicable.\n");
+      sb.append("item: ").append(bag.getItemField() != null ? yamlQuote(bag.getItemField()) : "null").append("\n");
+
       if (file.exists()) {
          file.delete();
       }
 
-      Files.write(file.toPath(), yamlStr.getBytes(StandardCharsets.UTF_8));
+      Files.write(file.toPath(), sb.toString().getBytes(StandardCharsets.UTF_8));
+   }
+
+   @SuppressWarnings("unchecked")
+   private void appendRewards(StringBuilder sb, List<?> rewards, ObjectMapper jsonMapper) {
+      if (rewards == null || rewards.isEmpty()) {
+         sb.append("  []\n");
+      } else {
+         try {
+            List<Object> list = jsonMapper.convertValue(rewards, List.class);
+            for (Object obj : list) {
+               sb.append("  - ").append(jsonMapper.writeValueAsString(obj)).append("\n");
+            }
+         } catch (Exception var6) {
+            sb.append("  []\n");
+         }
+      }
+   }
+
+   private String yamlQuote(String value) {
+      if (value == null) {
+         return "null";
+      }
+
+      if (value.isEmpty()) {
+         return "\"\"";
+      }
+
+      if (value.matches("[0-9].*") || value.contains(":") || value.contains("#") || value.contains("{")
+            || value.contains("}") || value.contains("[") || value.contains("]") || value.contains(",")
+            || value.contains("&") || value.contains("*") || value.contains("?") || value.contains("|")
+            || value.contains(">") || value.contains("%") || value.contains("@") || value.contains("`")
+            || value.startsWith("-") || value.startsWith("!") || value.startsWith("'") || value.startsWith("\"")) {
+         return "'" + value.replace("'", "''") + "'";
+      }
+
+      return value;
    }
 
    private LootBag readYaml(File file, ObjectMapper jsonMapper) throws IOException {

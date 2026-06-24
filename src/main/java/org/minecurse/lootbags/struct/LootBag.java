@@ -37,6 +37,10 @@ public class LootBag {
    private String item;
    @JsonProperty("texture")
    private String texture;
+   @JsonProperty("material")
+   private String material;
+   @JsonProperty("lore")
+   private List<String> lore;
    private List<Reward> rewards;
    private List<Reward> jackpotRewards;
    private List<Reward> bonusRewards;
@@ -55,6 +59,8 @@ public class LootBag {
    public LootBag(String internalName) {
       this.internalName = internalName;
       this.displayName = "&6" + internalName;
+      this.material = Material.CHEST.name();
+      this.lore = Lists.newArrayList();
       this.item = new SerializedItemStack(new ItemBuilder(Material.CHEST).name(this.displayName)).get();
       this.rewards = Lists.newArrayList();
       this.jackpotRewards = Lists.newArrayList();
@@ -73,6 +79,21 @@ public class LootBag {
    }
 
    public LootBag() {
+   }
+
+   @JsonIgnore
+   public String getDisplayNameField() {
+      return this.displayName;
+   }
+
+   @JsonIgnore
+   public String getMaterialField() {
+      return this.material;
+   }
+
+   @JsonIgnore
+   public String getItemField() {
+      return this.item;
    }
 
    @JsonIgnore
@@ -102,12 +123,19 @@ public class LootBag {
 
    @JsonIgnore
    public Material getMaterial() {
-      ItemStack item = this.getItemStack();
-      return item.getType();
+      if (this.material != null && !this.material.isEmpty()) {
+         try {
+            return Material.valueOf(this.material.toUpperCase());
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
+      return this.getItemStack().getType();
    }
 
    @JsonIgnore
    public void setMaterial(Material material) {
+      this.material = material.name();
       ItemStack item = this.getItemStack();
       item.setType(material);
       this.item = new SerializedItemStack(item).get();
@@ -140,18 +168,17 @@ public class LootBag {
 
    @JsonIgnore
    private ItemStack applyTextureToItem(ItemStack base) {
-      ItemMeta baseMeta = base.getItemMeta();
       String name = this.displayName != null && !this.displayName.isEmpty()
          ? StringUtil.color(this.displayName)
-         : (baseMeta != null && baseMeta.hasDisplayName() ? baseMeta.getDisplayName() : this.getFallbackDisplayName());
-      List<String> lore = baseMeta != null && baseMeta.hasLore() ? baseMeta.getLore() : Lists.newArrayList();
+         : this.getFallbackDisplayName();
+      List<String> effectiveLore = this.lore != null ? this.lore : Lists.newArrayList();
 
       ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
       ItemMeta meta = head.getItemMeta();
       if (meta != null) {
          meta.setDisplayName(name);
-         if (!lore.isEmpty()) {
-            meta.setLore(lore);
+         if (!effectiveLore.isEmpty()) {
+            meta.setLore(effectiveLore);
          }
          head.setItemMeta(meta);
       }
@@ -174,6 +201,10 @@ public class LootBag {
 
    @JsonIgnore
    public List<String> getLore() {
+      if (this.lore != null) {
+         return this.lore;
+      }
+
       ItemStack item = this.getItemStack();
       ItemMeta meta = item.getItemMeta();
       return meta != null && meta.hasLore() ? meta.getLore() : Lists.newArrayList();
@@ -181,11 +212,7 @@ public class LootBag {
 
    @JsonIgnore
    public void setLore(List<String> lore) {
-      ItemStack item = this.getItemStack();
-      ItemMeta meta = item.getItemMeta();
-      meta.setLore(lore);
-      item.setItemMeta(meta);
-      this.item = new SerializedItemStack(item).get();
+      this.lore = (lore == null) ? Lists.newArrayList() : Lists.newArrayList(lore);
    }
 
    @JsonIgnore
@@ -209,6 +236,21 @@ public class LootBag {
    @JsonIgnore
    public ItemStack getItemStack() {
       ItemStack itemStack = this.getRawItemStack();
+
+      if (this.material != null && !this.material.isEmpty()) {
+         try {
+            itemStack.setType(Material.valueOf(this.material.toUpperCase()));
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
+      if (this.lore != null && !this.lore.isEmpty()) {
+         ItemMeta meta = itemStack.getItemMeta();
+         if (meta != null) {
+            meta.setLore(this.lore);
+            itemStack.setItemMeta(meta);
+         }
+      }
 
       if (this.texture != null && !this.texture.isEmpty()) {
          itemStack = this.applyTextureToItem(itemStack);

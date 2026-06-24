@@ -56,8 +56,8 @@ public class LootBagCreationMenu implements Listener {
       ItemBuilder lore = new ItemBuilder(Material.BOOK_AND_QUILL)
          .name("&6&lLore Lines")
          .lore(
-            this.lootBag.getItemStack().hasItemMeta() && this.lootBag.getItemStack().getItemMeta().hasLore()
-               ? this.lootBag.getItemStack().getItemMeta().getLore()
+            this.lootBag.getLore() != null && !this.lootBag.getLore().isEmpty()
+               ? this.lootBag.getLore()
                : Lists.newArrayList("&fNo lore set.")
          )
          .lore("")
