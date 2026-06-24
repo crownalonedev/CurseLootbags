@@ -254,6 +254,7 @@ public class LootBagCreationMenu implements Listener {
 
                   currentLore.add(event.getMessage());
                   this.lootBag.setLore(currentLore);
+                  LootBagManager.getInstance().saveToDisk();
                   player.sendMessage(LootBagPlugin.prefix("Added lore line: &f" + event.getMessage()));
                   player.sendMessage(LootBagPlugin.prefix("&7Type another line to add more, 'clear' to wipe, or 'cancel' to finish."));
                   break;
