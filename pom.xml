@@ -283,14 +283,6 @@
             <version>2.14.1</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- SnakeYAML (bundled in Bukkit/Spigot at runtime, needed at compile time for lootbag .yml config files) -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.15</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
 
