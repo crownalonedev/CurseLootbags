@@ -130,8 +130,18 @@ public class LootBagManager {
                   if (loaded != null) {
                      this.LootBags.add(loaded);
                   }
-               } catch (Exception var9) {
-                  this.plugin.getLogger().warning("Failed to load lootbag from " + f.getName() + ": " + var9.getMessage());
+               } catch (Exception var10) {
+                  this.plugin.getLogger().warning("Failed to parse " + f.getName() + " normally, attempting repair: " + var10.getMessage());
+                  try {
+                     LootBag salvaged = this.salvageYaml(f, jsonMapper);
+                     if (salvaged != null) {
+                        this.writeYaml(f, salvaged, jsonMapper);
+                        this.plugin.getLogger().info("Repaired and re-saved " + f.getName());
+                        this.LootBags.add(salvaged);
+                     }
+                  } catch (Exception var9) {
+                     this.plugin.getLogger().severe("Could not repair " + f.getName() + ": " + var9.getMessage());
+                  }
                }
             }
          }
@@ -308,7 +318,8 @@ public class LootBagManager {
          try {
             List<Object> list = jsonMapper.convertValue(rewards, List.class);
             for (Object obj : list) {
-               sb.append("  - ").append(jsonMapper.writeValueAsString(obj)).append("\n");
+               String json = jsonMapper.writeValueAsString(obj);
+               sb.append("  - ").append(yamlQuote(json)).append("\n");
             }
          } catch (Exception var6) {
             sb.append("  []\n");
@@ -325,10 +336,16 @@ public class LootBagManager {
          return "\"\"";
       }
 
+      if (value.contains("\n") || value.contains("\r")) {
+         String escaped = value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+         return "\"" + escaped + "\"";
+      }
+
       if (value.matches("[0-9].*") || value.contains(":") || value.contains("#") || value.contains("{")
             || value.contains("}") || value.contains("[") || value.contains("]") || value.contains(",")
             || value.contains("&") || value.contains("*") || value.contains("?") || value.contains("|")
             || value.contains(">") || value.contains("%") || value.contains("@") || value.contains("`")
+            || value.contains("+") || value.contains("/") || value.contains("=")
             || value.startsWith("-") || value.startsWith("!") || value.startsWith("'") || value.startsWith("\"")) {
          return "'" + value.replace("'", "''") + "'";
       }
@@ -347,6 +364,98 @@ public class LootBagManager {
          Map<String, Object> data = (Map<String, Object>) loaded;
          return jsonMapper.convertValue(data, LootBag.class);
       }
+   }
+
+   @SuppressWarnings("unchecked")
+   private LootBag salvageYaml(File file, ObjectMapper jsonMapper) throws IOException {
+      String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+      String[] lines = content.split("\n", -1);
+      Map<String, Object> data = new java.util.LinkedHashMap<>();
+      StringBuilder itemBlob = null;
+
+      for (String rawLine : lines) {
+         String line = rawLine.replaceAll("\r$", "");
+         String trimmed = line.trim();
+         if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+            continue;
+         }
+
+         int colonIdx = -1;
+         for (int i = 0; i < trimmed.length(); i++) {
+            if (trimmed.charAt(i) == ':') {
+               if (i + 1 >= trimmed.length() || trimmed.charAt(i + 1) == ' ') {
+                  colonIdx = i;
+                  break;
+               }
+            }
+         }
+
+         if (itemBlob != null) {
+            if (colonIdx > 0 && this.isKnownKey(trimmed.substring(0, colonIdx))) {
+               if (itemBlob.length() > 0) {
+                  data.put("item", itemBlob.toString());
+               }
+               itemBlob = null;
+            } else {
+               itemBlob.append(trimmed);
+               continue;
+            }
+         }
+
+         if (colonIdx <= 0) {
+            continue;
+         }
+
+         String key = trimmed.substring(0, colonIdx).trim();
+         String value = (colonIdx + 1 < trimmed.length()) ? trimmed.substring(colonIdx + 1).trim() : "";
+         value = this.stripYamlQuotes(value);
+
+         if (key.equals("item")) {
+            itemBlob = new StringBuilder(value);
+         } else if (key.equals("lore")) {
+            data.put("lore", new java.util.ArrayList<String>());
+         } else if (key.equals("rewards") || key.equals("jackpotRewards") || key.equals("bonusRewards")) {
+            data.put(key, new java.util.ArrayList<>());
+         } else {
+            data.put(key, value);
+         }
+      }
+
+      if (itemBlob != null && itemBlob.length() > 0) {
+         data.put("item", itemBlob.toString());
+      }
+
+      if (!data.containsKey("internalName") && !data.containsKey("item")) {
+         return null;
+      } else {
+         return jsonMapper.convertValue(data, LootBag.class);
+      }
+   }
+
+   private boolean isKnownKey(String key) {
+      return key.equals("internalName") || key.equals("displayName") || key.equals("material")
+            || key.equals("texture") || key.equals("lore") || key.equals("rewards")
+            || key.equals("jackpotRewards") || key.equals("bonusRewards") || key.equals("minRewards")
+            || key.equals("maxRewards") || key.equals("broadcast") || key.equals("bundle")
+            || key.equals("glowing") || key.equals("bonusLore") || key.equals("rewardLore")
+            || key.equals("alwaysMax") || key.equals("showcasedLootBag") || key.equals("animationType")
+            || key.equals("type") || key.equals("item");
+   }
+
+   private String stripYamlQuotes(String value) {
+      if (value == null || value.isEmpty() || value.equals("null") || value.equals("[]")) {
+         return value;
+      }
+
+      if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+         return value.substring(1, value.length() - 1).replace("\\\"", "\"").replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r");
+      }
+
+      if (value.length() >= 2 && value.startsWith("'") && value.endsWith("'")) {
+         return value.substring(1, value.length() - 1).replace("''", "'");
+      }
+
+      return value;
    }
 
    public JavaPlugin getPlugin() {
