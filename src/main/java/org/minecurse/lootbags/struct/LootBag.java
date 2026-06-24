@@ -300,8 +300,8 @@ public class LootBag {
                builder.lore("&f&lBonus Rewards &f&l(&7" + this.getBonusRewards().size() + " items&f&l)");
 
                for (Reward reward2 : this.getBonusRewards()) {
-                  String rewardDisplayName = ItemUtil.getDisplayName(reward2.getItemStack());
-                  builder.lore(" &f&l• &f&l" + reward2.getItemStack().getAmount() + "x &r" + rewardDisplayName);
+                  String rewardDisplayName = this.safeRewardName(reward2);
+                  builder.lore(" &f&l• &f&l" + this.safeRewardAmount(reward2) + "x &r" + rewardDisplayName);
                }
 
                if (this.isRewardLore()) {
@@ -320,8 +320,8 @@ public class LootBag {
                builder.lore("&fThis Loot Bag has no rewards :(");
             } else {
                for (Reward reward3 : this.getRewards()) {
-                  String rewardDisplayName = ItemUtil.getDisplayName(reward3.getItemStack());
-                  builder.lore(" &f&l• &f&l" + reward3.getItemStack().getAmount() + "x &r" + rewardDisplayName);
+                  String rewardDisplayName = this.safeRewardName(reward3);
+                  builder.lore(" &f&l• &f&l" + this.safeRewardAmount(reward3) + "x &r" + rewardDisplayName);
                }
             }
          }
@@ -330,18 +330,24 @@ public class LootBag {
          builder.lore("&6&lLEGENDARY");
 
          for (Reward reward4 : filteredRewards) {
-            builder.lore(
-               "&e •" + reward4.getData().displayTheString() + " &f&l" + reward4.getMax() + "x " + reward4.getItemStack().getItemMeta().getDisplayName()
-            );
+            ItemStack rewardItem = this.safeRewardItem(reward4);
+            if (rewardItem != null) {
+               builder.lore(
+                  "&e •" + reward4.getData().displayTheString() + " &f&l" + reward4.getMax() + "x " + this.safeRewardName(reward4)
+               );
+            }
          }
 
          builder.lore("");
          builder.lore("&4&LSUPERIOR");
 
          for (Reward reward5 : this.getBonusRewards()) {
-            builder.lore(
-               "&c&l •" + reward5.getData().displayTheString() + " &f&l" + reward5.getMax() + "x " + reward5.getItemStack().getItemMeta().getDisplayName()
-            );
+            ItemStack rewardItem = this.safeRewardItem(reward5);
+            if (rewardItem != null) {
+               builder.lore(
+                  "&c&l •" + reward5.getData().displayTheString() + " &f&l" + reward5.getMax() + "x " + this.safeRewardName(reward5)
+               );
+            }
          }
 
          builder.lore("");
@@ -365,8 +371,8 @@ public class LootBag {
                builder.lore("&f&lBonus Rewards &f&l(&7" + this.getBonusRewards().size() + " items&f&l)");
 
                for (Reward reward2 : this.getBonusRewards()) {
-                  String rewardDisplayName = ItemUtil.getDisplayName(reward2.getItemStack());
-                  builder.lore(" &f&l• &f&l" + reward2.getItemStack().getAmount() + "x &r" + rewardDisplayName);
+                  String rewardDisplayName = this.safeRewardName(reward2);
+                  builder.lore(" &f&l• &f&l" + this.safeRewardAmount(reward2) + "x &r" + rewardDisplayName);
                }
 
                if (this.isRewardLore()) {
@@ -385,8 +391,8 @@ public class LootBag {
                builder.lore("&fThis Loot Bag has no rewards :(");
             } else {
                for (Reward reward3 : this.getRewards()) {
-                  String rewardDisplayName = ItemUtil.getDisplayName(reward3.getItemStack());
-                  builder.lore("&f&l➥ &7&l" + reward3.getItemStack().getAmount() + "x &r" + rewardDisplayName);
+                  String rewardDisplayName = this.safeRewardName(reward3);
+                  builder.lore("&f&l➥ &7&l" + this.safeRewardAmount(reward3) + "x &r" + rewardDisplayName);
                }
             }
          }
@@ -399,9 +405,12 @@ public class LootBag {
          builder.lore("&6&lLEGENDARY");
 
          for (Reward reward4 : filteredRewards) {
-            builder.lore(
-               "&e&l• " + reward4.getData().displayTheString() + " &f&l" + reward4.getMax() + "x " + reward4.getItemStack().getItemMeta().getDisplayName()
-            );
+            ItemStack rewardItem = this.safeRewardItem(reward4);
+            if (rewardItem != null) {
+               builder.lore(
+                  "&e&l• " + reward4.getData().displayTheString() + " &f&l" + reward4.getMax() + "x " + this.safeRewardName(reward4)
+               );
+            }
          }
 
          ArrayList<Reward> bonus = new ArrayList<>(this.getBonusRewards());
@@ -409,9 +418,12 @@ public class LootBag {
          builder.lore("&4&lSUPERIOR");
 
          for (Reward reward5 : bonus) {
-            builder.lore(
-               "&c&l• " + reward5.getData().displayTheString() + " &f&l" + reward5.getMax() + "x " + reward5.getItemStack().getItemMeta().getDisplayName()
-            );
+            ItemStack rewardItem = this.safeRewardItem(reward5);
+            if (rewardItem != null) {
+               builder.lore(
+                  "&c&l• " + reward5.getData().displayTheString() + " &f&l" + reward5.getMax() + "x " + this.safeRewardName(reward5)
+               );
+            }
          }
 
          builder.lore("");
@@ -420,6 +432,47 @@ public class LootBag {
       NBTItem item = new NBTItem(builder);
       item.setString("lootBagType", this.getInternalName());
       return item.getItem();
+   }
+
+   @JsonIgnore
+   private ItemStack safeRewardItem(Reward reward) {
+      if (reward == null) {
+         return null;
+      }
+
+      try {
+         return reward.getItemStack();
+      } catch (Exception var3) {
+         return null;
+      }
+   }
+
+   @JsonIgnore
+   private String safeRewardName(Reward reward) {
+      ItemStack stack = this.safeRewardItem(reward);
+      if (stack == null) {
+         return "&c[Invalid Reward]";
+      } else {
+         try {
+            return ItemUtil.getDisplayName(stack);
+         } catch (Exception var4) {
+            return "&c[Invalid Reward]";
+         }
+      }
+   }
+
+   @JsonIgnore
+   private int safeRewardAmount(Reward reward) {
+      ItemStack stack = this.safeRewardItem(reward);
+      if (stack == null) {
+         return 1;
+      } else {
+         try {
+            return stack.getAmount();
+         } catch (Exception var4) {
+            return 1;
+         }
+      }
    }
 
    @JsonIgnore
