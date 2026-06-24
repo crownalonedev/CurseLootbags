@@ -83,6 +83,16 @@ public class LootBagCreationMenu implements Listener {
          .lore("&7Current Material: &f" + this.lootBag.getMaterial().name())
          .lore("")
          .lore("&7Click here to edit the lootbag's material.");
+      boolean hasTexture = this.lootBag.hasTexture();
+      ItemBuilder texture = new ItemBuilder(Material.SKULL_ITEM)
+         .durability(hasTexture ? 3 : 0)
+         .name("&5&lBase64 Texture")
+         .lore("&7Custom Texture: &f" + (hasTexture ? "Yes" : "No"))
+         .lore("")
+         .lore("&7Click here to set a base64 player-head texture.")
+         .lore("&7Paste the base64 texture value in chat.")
+         .lore("")
+         .lore("&7Type 'remove' in chat to clear the texture.");
       ItemBuilder bundle = new ItemBuilder(Material.WORKBENCH)
          .name("&a&lBundle")
          .lore("&7Is Bundle: &f" + RetroUtils.formatBoolean(this.lootBag.isBundle()))
@@ -283,6 +293,18 @@ public class LootBagCreationMenu implements Listener {
          this.editType.put(player.getUniqueId(), EditType.MATERIAL);
          player.sendMessage(LootBagPlugin.prefix("You are now editing the lootbag's Material"));
          player.sendMessage(LootBagPlugin.prefix("Hold a valid material and type anything to set its content."));
+         player.closeInventory();
+      }));
+      this.menu.setButton(41, new Button(texture, (player1, clickInformation) -> {
+         this.editType.put(player.getUniqueId(), EditType.TEXTURE);
+         player.sendMessage(LootBagPlugin.prefix("You are now editing the lootbag's Base64 Texture"));
+         if (this.lootBag.hasTexture()) {
+            player.sendMessage(LootBagPlugin.prefix("&7A custom texture is currently set on this lootbag."));
+         } else {
+            player.sendMessage(LootBagPlugin.prefix("&7No custom texture is currently set."));
+         }
+         player.sendMessage(LootBagPlugin.prefix("&7Paste the base64 texture value (from heads.minecraftfolder.com etc) in chat."));
+         player.sendMessage(LootBagPlugin.prefix("&7Type 'remove' to clear the texture, or 'cancel' to abort."));
          player.closeInventory();
       }));
       this.menu.setButton(43, new Button(animationType, (player1, clickInformation) -> {
@@ -498,6 +520,34 @@ public class LootBagCreationMenu implements Listener {
                      player.sendMessage(LootBagPlugin.prefix("Your current lootbag action has been completed."));
                   } else {
                      player.sendMessage(LootBagPlugin.prefix("&cYou must be holding a valid item."));
+                  }
+                  break;
+               case TEXTURE:
+                  if (message.equalsIgnoreCase("cancel")) {
+                     this.editType.remove(player.getUniqueId());
+                     player.sendMessage(LootBagPlugin.prefix("You have canceled the texture process."));
+                     this.menu.show(player);
+                     this.sound(player);
+                     return;
+                  }
+
+                  String textureValue = event.getMessage();
+                  if (textureValue.equalsIgnoreCase("remove") || textureValue.equalsIgnoreCase("clear") || textureValue.equalsIgnoreCase("null")) {
+                     this.lootBag.removeTexture();
+                     player.sendMessage(LootBagPlugin.prefix("The base64 texture has been removed from {0}.", this.lootBag.getInternalName()));
+                     this.onFinish(player);
+                     return;
+                  }
+
+                  try {
+                     this.lootBag.setTexture(textureValue);
+                     player.sendMessage(LootBagPlugin.prefix("The base64 texture has been applied to {0}.", this.lootBag.getInternalName()));
+                     this.onFinish(player);
+                  } catch (Exception var20) {
+                     player.sendMessage(LootBagPlugin.prefix("&cThat does not appear to be a valid base64 texture value."));
+                     this.editType.remove(player.getUniqueId());
+                     this.menu.show(player);
+                     this.sound(player);
                   }
             }
          }

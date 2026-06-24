@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Flags;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
@@ -42,9 +43,12 @@ public class LootBagCommand extends BaseCommand {
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el givehalf <player> <lootBag> <left:right>"));
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el create <internalName>"));
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el edit <lootBag>"));
+            sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el setdisplay <lootBag> <name...>"));
+            sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el settexture <lootBag> <base64|remove>"));
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el delete <lootBag>"));
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el list"));
             sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el gui"));
+            sender.sendMessage(LootBagPlugin.prefix("&cUsage: /el save"));
          } else {
             LootBagDisplayMenu.getInventory().open((Player)sender);
          }
@@ -93,6 +97,57 @@ public class LootBagCommand extends BaseCommand {
       player.sendMessage(LootBagPlugin.prefix("You are now editing the {0} &7lootbag.", bag.getInternalName()));
       PlayerUtils.playSound(player, Sound.LEVEL_UP, 0.75F);
       new LootBagCreationMenu(bag).show(player);
+   }
+
+   @CommandPermission("curse.admin")
+   @Subcommand("setdisplay|displayname|rename")
+   @CommandCompletion("@lootBags")
+   public void onSetDisplay(CommandSender sender, LootBag bag, @Flags("greedy") String displayName) {
+      if (displayName == null || displayName.trim().isEmpty()) {
+         sender.sendMessage(LootBagPlugin.prefix("&cYou must provide a display name."));
+         return;
+      }
+
+      bag.setDisplayName(displayName);
+      bag.setDisplay(displayName);
+      sender.sendMessage(LootBagPlugin.prefix("The display name of {0} &7is now {1}&7.", bag.getInternalName(), bag.getDisplayName()));
+      if (sender instanceof Player) {
+         PlayerUtils.playSound((Player)sender, Sound.LEVEL_UP, 0.75F);
+      }
+   }
+
+   @CommandPermission("curse.admin")
+   @Subcommand("settexture|texture")
+   @CommandCompletion("@lootBags")
+   public void onSetTexture(CommandSender sender, LootBag bag, @Flags("greedy") String base64) {
+      if (base64 == null || base64.trim().isEmpty()) {
+         sender.sendMessage(LootBagPlugin.prefix("&cYou must provide a base64 texture value (or 'remove')."));
+         return;
+      }
+
+      if (base64.trim().equalsIgnoreCase("remove") || base64.trim().equalsIgnoreCase("clear") || base64.trim().equalsIgnoreCase("null")) {
+         bag.removeTexture();
+         sender.sendMessage(LootBagPlugin.prefix("The base64 texture has been removed from {0}.", bag.getInternalName()));
+      } else {
+         try {
+            bag.setTexture(base64);
+            sender.sendMessage(LootBagPlugin.prefix("The base64 texture has been applied to {0}.", bag.getInternalName()));
+         } catch (Exception var5) {
+            sender.sendMessage(LootBagPlugin.prefix("&cThat does not appear to be a valid base64 texture value."));
+            return;
+         }
+      }
+
+      if (sender instanceof Player) {
+         PlayerUtils.playSound((Player)sender, Sound.LEVEL_UP, 0.75F);
+      }
+   }
+
+   @CommandPermission("curse.admin")
+   @Subcommand("save")
+   public void onSave(CommandSender sender) {
+      LootBagManager.getInstance().saveToDisk();
+      sender.sendMessage(LootBagPlugin.prefix("All lootbags have been saved to disk."));
    }
 
    @CommandPermission("curse.admin")

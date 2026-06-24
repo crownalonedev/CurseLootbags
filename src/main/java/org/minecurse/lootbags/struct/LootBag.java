@@ -2,10 +2,14 @@ package org.minecurse.lootbags.struct;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTListCompound;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.bukkit.Material;
@@ -97,6 +101,107 @@ public class LootBag {
    public void setMaterial(Material material) {
       ItemStack item = this.getItemStack();
       item.setType(material);
+      this.item = new SerializedItemStack(item).get();
+   }
+
+   @JsonIgnore
+   public String getTexture() {
+      ItemStack item = this.getItemStack();
+      if (item == null || item.getType() != Material.SKULL_ITEM) {
+         return null;
+      }
+
+      try {
+         NBTItem nbt = new NBTItem(item);
+         if (!nbt.hasKey("SkullOwner")) {
+            return null;
+         }
+
+         NBTCompound skullOwner = nbt.getCompound("SkullOwner");
+         if (skullOwner == null || !skullOwner.hasKey("Properties")) {
+            return null;
+         }
+
+         NBTCompound properties = skullOwner.getCompound("Properties");
+         if (properties == null || !properties.hasKey("textures")) {
+            return null;
+         }
+
+         NBTCompoundList textures = properties.getCompoundList("textures");
+         for (Object entry : textures) {
+            if (entry instanceof NBTCompound) {
+               String value = ((NBTCompound)entry).getString("Value");
+               if (value != null && !value.isEmpty()) {
+                  return value;
+               }
+            }
+         }
+
+         return null;
+      } catch (Exception ignored) {
+         return null;
+      }
+   }
+
+   @JsonIgnore
+   public boolean hasTexture() {
+      return this.getTexture() != null;
+   }
+
+   @JsonIgnore
+   public void setTexture(String base64) {
+      if (base64 == null || base64.trim().isEmpty() || base64.equalsIgnoreCase("null") || base64.equalsIgnoreCase("remove") || base64.equalsIgnoreCase("clear")) {
+         this.removeTexture();
+         return;
+      }
+
+      String currentName = this.getDisplayName();
+      List<String> currentLore = this.getLore();
+
+      ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+      ItemMeta meta = head.getItemMeta();
+      if (meta != null) {
+         meta.setDisplayName(StringUtil.color(currentName));
+         if (currentLore != null && !currentLore.isEmpty()) {
+            meta.setLore(currentLore);
+         }
+
+         head.setItemMeta(meta);
+      }
+
+      NBTItem nbt = new NBTItem(head);
+      NBTCompound skullOwner = nbt.addCompound("SkullOwner");
+      skullOwner.setString("Id", UUID.randomUUID().toString());
+      skullOwner.setString("Name", this.internalName == null ? "lootbag" : this.internalName);
+      NBTCompound properties = skullOwner.addCompound("Properties");
+      NBTCompoundList texturesList = properties.getCompoundList("textures");
+      NBTListCompound textureEntry = texturesList.addCompound();
+      textureEntry.setString("Value", base64.trim());
+      head = nbt.getItem();
+
+      this.item = new SerializedItemStack(head).get();
+   }
+
+   @JsonIgnore
+   public void removeTexture() {
+      ItemStack item = this.getItemStack();
+      if (item == null) {
+         return;
+      }
+
+      try {
+         NBTItem nbt = new NBTItem(item);
+         if (nbt.hasKey("SkullOwner")) {
+            nbt.removeKey("SkullOwner");
+            item = nbt.getItem();
+         }
+      } catch (Exception ignored) {
+      }
+
+      if (item.getType() == Material.SKULL_ITEM) {
+         item.setType(Material.CHEST);
+      }
+
       this.item = new SerializedItemStack(item).get();
    }
 

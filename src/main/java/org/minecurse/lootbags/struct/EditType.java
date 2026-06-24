@@ -9,5 +9,6 @@ public enum EditType {
    MATERIAL,
    LOOTBAG_TYPE,
    ANIMATION_TYPE,
-   META;
+   META,
+   TEXTURE;
 }
