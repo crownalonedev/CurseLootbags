@@ -112,8 +112,8 @@ public class BattleQueueMenu implements InventoryProvider {
             PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
          } else {
             int totalBoxes = LootBagUtils.countLootBags(player, lootBag);
-            if (totalBoxes < 1) {
-               player.sendMessage(LootBagPlugin.hypePrefix("&cYou need at least 1 Hype box to create a battle."));
+            if (totalBoxes < 3) {
+               player.sendMessage(LootBagPlugin.hypePrefix("&cYou need at least 3 Hype box to create a battle."));
                PlayerUtils.playSound(player, Sound.ITEM_BREAK, 0.5F);
             } else {
                PlayerUtils.playSound(player, Sound.ANVIL_USE, 1.25F);

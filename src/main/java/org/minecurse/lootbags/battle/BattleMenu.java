@@ -40,6 +40,7 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
    private final int tickEndPoint;
    private final Map<PlayerBattle, List<Reward>> currentItems = new HashMap<>();
    private final SmartInventory inventory;
+   private final SmartInventory spectatorInventory;
    private int currentRollIndex = 0;
    private int currentCount = 0;
    private float pitch;
@@ -62,6 +63,10 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
 
    public SmartInventory getInventory() {
       return this.inventory;
+   }
+
+   public SmartInventory getSpectatorInventory() {
+      return this.spectatorInventory;
    }
 
    public int getCurrentRollIndex() {
@@ -101,6 +106,14 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
          .size(6, 9)
          .title(StringUtil.color(battleInfo.getLootBag().getDisplayName() + "&8 - Hype Box Battle"))
          .closeable(false)
+         .clickable(false)
+         .build();
+      this.spectatorInventory = SmartInventory.builder()
+         .id("hype-box-spec")
+         .provider(this)
+         .size(6, 9)
+         .title(StringUtil.color(battleInfo.getLootBag().getDisplayName() + "&8 - Spectating Battle"))
+         .closeable(true)
          .clickable(false)
          .build();
       this.currentItems.put(battleInfo.getPlayerOne(), this.rollRewards());
@@ -174,6 +187,20 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
          }
 
          BattleManager.getInstance().getActiveBattles().remove(this.battleInfo);
+
+         Bukkit.getScheduler().runTaskLater(LootBagPlugin.getInstance(), () -> {
+            if (this.battleInfo.getPlayerOne().getPlayer().isOnline()) {
+               this.battleInfo.getPlayerOne().getPlayer().closeInventory();
+            }
+            if (!this.battleInfo.getPlayerTwo().isBot() && this.battleInfo.getPlayerTwo().getPlayer().isOnline()) {
+               this.battleInfo.getPlayerTwo().getPlayer().closeInventory();
+            }
+            for (Player spec : this.battleInfo.getSpectators()) {
+               if (spec.isOnline()) {
+                  spec.closeInventory();
+               }
+            }
+         }, 40L);
       }
    }
 
@@ -260,7 +287,7 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
                )
             );
          } else {
-            contents.set(row, column, ClickableItem.empty(new ItemStack(Material.AIR)));
+            contents.set(row, column, null);
          }
       }
 
@@ -275,7 +302,7 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
                .lore(new String[]{"", "&fPrice: &b$" + this.battleInfo.getPlayerTwo().getItemsUnboxed().get(index).getCost()});
             contents.set(row, column, ClickableItem.empty(item));
          } else {
-            contents.set(row, column, ClickableItem.empty(new ItemStack(Material.AIR)));
+            contents.set(row, column, null);
          }
       }
    }
@@ -304,6 +331,13 @@ public class BattleMenu extends BukkitRunnable implements InventoryProvider {
             contentsp1.ifPresent(inventoryContents -> this.init(this.battleInfo.getPlayerOne().getPlayer(), inventoryContents));
             Optional<InventoryContents> contentsp2 = CommonsPlugin.getInstance().getInventoryManager().getContents(this.battleInfo.getPlayerTwo().getPlayer());
             contentsp2.ifPresent(inventoryContents -> this.init(this.battleInfo.getPlayerTwo().getPlayer(), inventoryContents));
+
+            for (Player spec : this.battleInfo.getSpectators()) {
+               if (spec.isOnline()) {
+                  Optional<InventoryContents> c = CommonsPlugin.getInstance().getInventoryManager().getContents(spec);
+                  c.ifPresent(inventoryContents -> this.init(spec, inventoryContents));
+               }
+            }
             if (this.currentRollIndex >= this.tickEndPoint) {
                int p1Index = (this.currentItems.get(this.battleInfo.getPlayerOne()).size() - 1 - 3 + this.tickEndPoint) % this.currentItems.get(this.battleInfo.getPlayerOne()).size();
                Reward p1Reward = this.currentItems.get(this.battleInfo.getPlayerOne()).get(p1Index);

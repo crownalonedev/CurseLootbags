@@ -46,4 +46,19 @@ public class HypeBoxCommand extends BaseCommand {
          battleManager.getActiveBattles().remove(battleInfo);
       }
    }
+
+   @Subcommand("watch")
+   public void onWatch(Player player, String targetName) {
+      for (BattleInfo info : BattleManager.getInstance().getActiveBattles()) {
+         if (info.isActive() && (info.getPlayerOne().getPlayer().getName().equalsIgnoreCase(targetName) || (!info.getPlayerTwo().isBot() && info.getPlayerTwo().getPlayer().getName().equalsIgnoreCase(targetName)))) {
+            if (!info.getSpectators().contains(player)) {
+               info.getSpectators().add(player);
+            }
+            info.getBattleMenu().getSpectatorInventory().open(player);
+            player.sendMessage(LootBagPlugin.hypePrefix("&aYou are now spectating the battle!"));
+            return;
+         }
+      }
+      player.sendMessage(LootBagPlugin.hypePrefix("&cThat player is not currently in an active battle."));
+   }
 }
