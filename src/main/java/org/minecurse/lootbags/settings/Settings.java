@@ -3,6 +3,7 @@ package org.minecurse.lootbags.settings;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class Settings {
+   public static boolean debug;
    public static String storeUrl;
    public static String serverName;
    public static String crateBroadcast;
@@ -16,6 +17,7 @@ public class Settings {
    public static String hypeWaveEndedMessage;
 
    public static void load(FileConfiguration config) {
+      debug = config.getBoolean("debug", false);
       storeUrl = config.getString("store-url", "store.infusedpvp.org");
       serverName = config.getString("server-name", "Curse");
       botName = config.getString("bot-name", "&a&lCurse Bot");

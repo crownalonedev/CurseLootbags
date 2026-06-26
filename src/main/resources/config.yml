@@ -1,3 +1,5 @@
+debug: false
+
 bonus-lore:
   - ' '
   - '&7&nRight-Click&r &7(in your hand) to receive'

@@ -1,7 +1,11 @@
 package org.minecurse.lootbags.listeners;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,24 +14,29 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.minecurse.commons.utils.StringUtil;
 import org.minecurse.lootbags.LootBagPlugin;
 import org.minecurse.lootbags.battle.BattleInfo;
 import org.minecurse.lootbags.battle.BattleMenu;
 import org.minecurse.lootbags.events.HypeBoxFinishEvent;
+import org.minecurse.lootbags.settings.Settings;
 import org.minecurse.lootmanager.struct.Reward;
 import org.minecurse.modules.utils.ItemUtil;
 
 public class HyperBoxListener implements Listener {
    private final LootBagPlugin plugin;
+   private final Map<UUID, Integer> pendingCreativeDrops = new HashMap<>();
 
    public HyperBoxListener(LootBagPlugin plugin) {
       this.plugin = plugin;
@@ -173,12 +182,97 @@ public class HyperBoxListener implements Listener {
    @EventHandler
    public void onInventoryClick(InventoryClickEvent event) {
       Player player = (Player)event.getWhoClicked();
-      Bukkit.getScheduler().runTaskLater(LootBagPlugin.getInstance(), player::updateInventory, 1L);
+      this.scheduleInventoryUpdate(player, "inventory click");
+   }
+
+   @EventHandler(priority = EventPriority.MONITOR)
+   public void onCreativeDrop(InventoryCreativeEvent event) {
+      if (event.getRawSlot() >= 0) {
+         return;
+      }
+
+      Player player = (Player)event.getWhoClicked();
+      ItemStack cursor = event.getCursor();
+      if (player.getGameMode() != GameMode.CREATIVE || cursor == null || cursor.getType() == Material.AIR) {
+         return;
+      }
+
+      if (event.isCancelled()) {
+         if (Settings.debug) {
+            this.plugin.getLogger().info("Creative category drop was cancelled for " + player.getName() + ".");
+         }
+         return;
+      }
+
+      ItemStack drop = cursor.clone();
+      UUID playerId = player.getUniqueId();
+      this.incrementPendingCreativeDrop(playerId);
+      if (Settings.debug) {
+         this.plugin.getLogger().info("Tracking creative category drop for " + player.getName() + ": " + drop.getType() + " x" + drop.getAmount() + ".");
+      }
+
+      Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+         if (!this.consumePendingCreativeDrop(playerId)) {
+            return;
+         }
+
+         if (player.isOnline()) {
+            player.getWorld().dropItemNaturally(player.getLocation(), drop);
+            if (Settings.debug) {
+               this.plugin.getLogger().info("Manually spawned missing creative category drop for " + player.getName() + ".");
+            }
+         }
+      }, 1L);
+   }
+
+   @EventHandler(priority = EventPriority.MONITOR)
+   public void onDrop(PlayerDropItemEvent event) {
+      Player player = event.getPlayer();
+      if (player.getGameMode() == GameMode.CREATIVE && this.consumePendingCreativeDrop(player.getUniqueId()) && Settings.debug) {
+         this.plugin.getLogger().info(
+            "Server " + (event.isCancelled() ? "cancelled" : "handled") + " creative category drop for " + player.getName() + "."
+         );
+      }
    }
 
    @EventHandler
    public void onInventoryClose(InventoryCloseEvent event) {
       Player player = (Player)event.getPlayer();
-      Bukkit.getScheduler().runTaskLater(LootBagPlugin.getInstance(), player::updateInventory, 1L);
+      this.scheduleInventoryUpdate(player, "inventory close");
+   }
+
+   private void scheduleInventoryUpdate(Player player, String reason) {
+      if (player.getGameMode() == GameMode.CREATIVE) {
+         if (Settings.debug) {
+            this.plugin.getLogger().info("Skipping forced inventory update for creative player " + player.getName() + " after " + reason + ".");
+         }
+         return;
+      }
+
+      Bukkit.getScheduler().runTaskLater(LootBagPlugin.getInstance(), () -> {
+         if (player.isOnline()) {
+            player.updateInventory();
+         }
+      }, 1L);
+   }
+
+   private void incrementPendingCreativeDrop(UUID playerId) {
+      Integer count = this.pendingCreativeDrops.get(playerId);
+      this.pendingCreativeDrops.put(playerId, count == null ? 1 : count + 1);
+   }
+
+   private boolean consumePendingCreativeDrop(UUID playerId) {
+      Integer count = this.pendingCreativeDrops.get(playerId);
+      if (count == null || count <= 0) {
+         return false;
+      }
+
+      if (count == 1) {
+         this.pendingCreativeDrops.remove(playerId);
+      } else {
+         this.pendingCreativeDrops.put(playerId, count - 1);
+      }
+
+      return true;
    }
 }

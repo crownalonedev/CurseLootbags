@@ -134,9 +134,11 @@ public class HypeBox implements InventoryProvider {
                   HypeBoxFinishEvent finishEvent = new HypeBoxFinishEvent(player, this, this.reward);
                   finishEvent.call();
                }
+               this.closeInventory(player);
             } else {
                PlayerUtils.addItems(player, new ItemStack[]{this.lootBag.getLootBag()});
                this.finished = true;
+               this.closeInventory(player);
             }
          }).runSyncLater(15L);
       }
@@ -195,6 +197,12 @@ public class HypeBox implements InventoryProvider {
 
    public boolean isAlreadyCalled() {
       return this.alreadyCalled;
+   }
+
+   private void closeInventory(Player player) {
+      if (player.isOnline()) {
+         player.closeInventory();
+      }
    }
 
    private ItemStack safeRewardItem(Reward reward) {
