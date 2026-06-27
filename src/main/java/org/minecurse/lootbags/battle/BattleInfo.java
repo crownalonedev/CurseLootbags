@@ -73,7 +73,17 @@ public class BattleInfo {
       String p2Name = this.playerTwo.isBot() ? org.minecurse.lootbags.settings.Settings.botName : this.playerTwo.getPlayer().getDisplayName();
 
       net.md_5.bungee.api.chat.BaseComponent[] msg = net.md_5.bungee.api.chat.TextComponent.fromLegacyText(
-         LootBagPlugin.hypePrefix("&fA new battle " + p1Name + " &fvs. " + p2Name + " &fwith &b" + this.count + "x &r" + this.lootBag.getDisplayName() + "&f is occurring! ")
+         LootBagPlugin.hypePrefix(
+            "&fA new battle is occurring! "
+               + p1Name
+               + " &fvs. "
+               + p2Name
+               + " &fwith &b&l"
+               + this.count
+               + "x &r"
+               + this.lootBag.getDisplayName()
+               + " "
+         )
       );
       net.md_5.bungee.api.chat.TextComponent click = new net.md_5.bungee.api.chat.TextComponent(
          net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', "&a&l[CLICK TO WATCH]")
@@ -93,7 +103,9 @@ public class BattleInfo {
       finalMsg.addExtra(click);
 
       for (org.bukkit.entity.Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+         p.sendMessage("");
          p.spigot().sendMessage(finalMsg);
+         p.sendMessage("");
       }
    }
 }
